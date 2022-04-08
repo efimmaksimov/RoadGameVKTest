@@ -55,7 +55,8 @@
                             'rewarded_state_changed', 
                             state => { unityInstance.SendMessage('InstantGamesBridge', 'OnRewardedStateChanged', state) })
 
-                        unityInstance.SendMessage('InstantGamesBridge', 'OnInitializationCompleted', 'true')
+                        instantGamesBridge.advertisement.setMinimumDelayBetweenInterstitial(180)
+			unityInstance.SendMessage('InstantGamesBridge', 'OnInitializationCompleted', 'true')
                     })
                     .catch(error => {
                         unityInstance.SendMessage('InstantGamesBridge', 'OnInitializationCompleted', 'false')
