@@ -28,7 +28,51 @@
     <body>
         <canvas id="unity-canvas" style="width: 100%; height: 100%; background: #FFFFFF; position: absolute; top: 0px; left: 0px;"></canvas>
         <div id="loading"><span id="loading-text"></span></div>
-        <script src="Build/1c545332af8d46a03de13097c17364f5.js"></script>
+        <!-- Yandex.Metrika counter -->
+        <script type="text/javascript" >
+            (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+           m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+           (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+           ym(87530826, "init", {
+                clickmap:true,
+                trackLinks:true,
+                accurateTrackBounce:true
+           });
+
+           function NotBounce()
+           {
+                ym(87530826, 'notBounce')
+		   }
+
+           function EventStartGame(id)
+           {
+                ym(87530826, 'hit', `#StartGame ${id}`, { title: `StartGame ${id}` })
+		   }
+
+           function EventGameOver(id)
+           {
+                ym(87530826, 'hit', `#GameOver ${id}`, { title: `GameOver ${id}` })
+		   }
+
+           function EventWatchRewarded()
+           {
+                ym(87530826, 'hit', '#WatchRewarded', { title: 'WatchRewarded' })
+		   }
+
+           function EventUpgrade(id)
+           {
+                ym(87530826, 'hit', `#Upgrade ${id}`, { title: `Upgrade ${id}` })
+		   }
+
+           function EventBuyCar(id)
+           {
+                ym(87530826, 'hit', `#Buy car ${id}`, { title: `Buy car ${id}` })
+		   }
+        </script>
+<noscript><div><img src="https://mc.yandex.ru/watch/87530826" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+        <script src="Build/RoadGameVK.loader.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/mewtongames/instant-games-bridge@1.0.2/dist/instant-games-bridge.js"></script>
         <script>
             if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
@@ -43,6 +87,8 @@
             let loading = document.getElementById('loading')
             let loadingText = document.getElementById('loading-text')
 
+            var lb
+
             window.initialize = function() {
                 instantGamesBridge
                     .initialize()
@@ -55,8 +101,13 @@
                             'rewarded_state_changed', 
                             state => { unityInstance.SendMessage('InstantGamesBridge', 'OnRewardedStateChanged', state) })
 
-                        instantGamesBridge.advertisement.setMinimumDelayBetweenInterstitial(180)
-			unityInstance.SendMessage('InstantGamesBridge', 'OnInitializationCompleted', 'true')
+                        if (instantGamesBridge.platform.id == 'yandex')
+                        {
+                            instantGamesBridge.platform.sdk.getLeaderboards()
+                            .then(_lb => lb = _lb);              
+						}
+
+                        unityInstance.SendMessage('InstantGamesBridge', 'OnInitializationCompleted', 'true')
                     })
                     .catch(error => {
                         unityInstance.SendMessage('InstantGamesBridge', 'OnInitializationCompleted', 'false')
@@ -147,17 +198,25 @@
                 .then(data => console.log(data.success))  
                 .catch(error => console.log(error));
 			}
+
+            function SetLeaderboardScore(leaderboardName, score)
+            {
+                instantGamesBridge.platform.sdk.getLeaderboards()
+                  .then(lb => {
+                   lb.setLeaderboardScore('leaderboardName', score);
+                });
+			}
             
             createUnityInstance(
                 document.querySelector('#unity-canvas'), 
                 {
-                    dataUrl: 'Build/2cbb3af347d50a3ffbe61e8ff921f791.data.unityweb',
-                    frameworkUrl: 'Build/da9341607d7975f8554de18ed6adc4a1.js.unityweb',
-                    codeUrl: 'Build/f02bd2e1f8f3421d3fa967fa87ebfc36.wasm.unityweb',
+                    dataUrl: 'Build/RoadGameVK.data.unityweb',
+                    frameworkUrl: 'Build/RoadGameVK.framework.js.unityweb',
+                    codeUrl: 'Build/RoadGameVK.wasm.unityweb',
                     streamingAssetsUrl: 'StreamingAssets',
                     companyName: 'EfimMaksimov',
                     productName: 'Zombie Road',
-                    productVersion: '1.9',
+                    productVersion: '1.6',
                     // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
                     // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
                 },
@@ -177,4 +236,3 @@
         </script>
     </body>
 </html>
-
